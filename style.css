@@ -23,7 +23,7 @@ header {
 header img {
     width: 80px;
     height: 80px;
-    border-radius: 50%; /* গোলাকৃতি */
+    border-radius: 50%; /* গোলাকৃতি লোগো */
     object-fit: cover;
     display: block;
     margin: 0 auto 10px;
@@ -43,7 +43,7 @@ header p {
     max-width: 1000px;
     width: 95%;
     margin: 20px auto;
-    flex: 1; /* footer sticky effect */
+    flex: 1 0 auto; /* footer sticky effect */
 }
 
 /* ====== TABS ====== */
@@ -62,6 +62,7 @@ header p {
     border-radius: 8px;
     font-weight: bold;
     transition: background 0.3s;
+    cursor: pointer;
 }
 .tab-btn:hover {
     background: #1565c0;
@@ -201,6 +202,10 @@ header p {
     padding: 8px 15px;
     border: none;
     border-radius: 6px;
+    cursor: pointer;
+}
+.pdf-btn:hover {
+    background: #1565c0;
 }
 
 /* ====== FOOTER ====== */
@@ -210,6 +215,7 @@ footer {
     padding: 25px 10px;
     text-align: center;
     font-size: 0.9rem;
+    flex-shrink: 0; /* footer always visible */
 }
 footer a {
     color: #4fc3f7;
@@ -238,5 +244,9 @@ footer img {
     }
     #adminLogin input {
         width: 45%;
+    }
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 }
