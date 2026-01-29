@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আঞ্চলিক গণিত উৎসব ২০২৬ – রাজশাহী</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <img src="assets/logo.png" alt="Logo">
+    <h1>আঞ্চলিক গণিত উৎসব ২০২৬ – রাজশাহী</h1>
+    <p>তারিখ: ৩১ জানুয়ারি ২০২৬ | রিপোর্টিং: সকাল ৮:০০<br>
+       ভেন্যু: <a href="https://maps.app.goo.gl/LzsYcZigZ1t57iuq9" target="_blank">রাজশাহী শিক্ষা বোর্ড মডেল স্কুল এন্ড কলেজ</a>
+    </p>
+</header>
+
+<div class="container">
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('volunteerTab')">Volunteer</button>
+        <button class="tab-btn" onclick="openTab('adminTab')">Admin</button>
+    </div>
+
+    <!-- Volunteer Tab -->
+    <div id="volunteerTab" class="tab-content">
+        <div class="card">
+            <div class="search-box">
+                <input id="phoneInput" placeholder="ফোন নাম্বার">
+                <button onclick="searchVolunteer()">Search</button>
+            </div>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <!-- Admin Tab -->
+    <div id="adminTab" class="tab-content" style="display:none;">
+        <div class="card">
+            <div id="adminLogin">
+                <input id="adminUser" placeholder="Username">
+                <input type="password" id="adminPass" placeholder="Password">
+                <button onclick="loginAdmin()">Login</button>
+            </div>
+            <div id="adminTable">
+                <select id="filterDuty" class="filter-select" onchange="filterDutyList()">
+                    <option value="">সকল দায়িত্ব</option>
+                </select>
+                <button onclick="downloadPDF()" class="pdf-btn">Download Volunteer List (PDF)</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>নাম</th>
+                            <th>ফটো</th>
+                            <th>ফোন</th>
+                            <th>ইমেইল</th>
+                            <th>লিঙ্গ</th>
+                            <th>রক্তের গ্রুপ</th>
+                            <th>দায়িত্ব</th>
+                            <th>রুম</th>
+                            <th>টি-শার্ট</th>
+                            <th>অতিরিক্ত তথ্য</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>© <a href="https://pabsraj.wordpress.com" target="_blank">প্রথম আলো বন্ধুসভা, রাজশাহী</a></p>
+    <p>Developed by <img src="assets/users/utsab.jpg"> Utsab Sarker</p>
+    <p class="notice">বিশেষ দ্রষ্টব্য: এটি কোনো অফিসিয়াল অলিম্পিয়াড ওয়েবসাইট নয়।</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
