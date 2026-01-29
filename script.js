@@ -1,109 +1,149 @@
-let volunteers = [];
-let adminData = {username:"admin",password:"123456",pdf:"assets/volunteer_list.pdf"};
+// =================== TAB SWITCH ===================
+function openTab(evt, tabName) {
+    const contents = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < contents.length; i++) {
+        contents[i].style.display = "none";
+    }
 
-// Load volunteer JSON
-fetch('data/volunteers.json')
-.then(res=>res.json())
-.then(data=>volunteers=data);
+    const buttons = document.getElementsByClassName("tab-btn");
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.remove("active");
+    }
 
-// ===== Tabs =====
-function openTab(tabName){
-    document.querySelectorAll('.tab-content').forEach(tc=>tc.style.display='none');
-    document.getElementById(tabName).style.display='block';
-    document.querySelectorAll('.tab-btn').forEach(tb=>tb.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
 }
 
-// ===== Volunteer Search =====
-function searchVolunteer(){
-    const phone = document.getElementById('phoneInput').value.trim();
-    const box = document.getElementById('result');
-    box.innerHTML='';
+// =================== VOLUNTEER DATA ===================
+// Volunteer JSON লোড
+let volunteers = [];
+fetch('volunteers.json')
+    .then(response => response.json())
+    .then(data => {
+        volunteers = data;
+    })
+    .catch(err => console.error('Volunteer JSON load error:', err));
 
-    if(!/01\d{9}/.test(phone)){
-        box.innerHTML='<div class="card">⚠️ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।</div>';
+// Volunteer search function
+function searchVolunteer() {
+    const phone = document.getElementById('searchPhone').value.trim();
+    const resultDiv = document.getElementById('volunteerResult');
+    resultDiv.innerHTML = '';
+
+    if (phone.length !== 11 || !/^01\d{9}$/.test(phone)) {
+        resultDiv.innerHTML = '<div class="card" style="color:red;text-align:center;">⚠️ সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।</div>';
         return;
     }
 
-    const v = volunteers.find(x=>x.phone===phone);
-    if(!v){
-        box.innerHTML='<div class="card">ভলেন্টিয়ার পাওয়া যায়নি।</div>';
+    const volunteer = volunteers.find(v => v.phone === phone);
+    if (!volunteer) {
+        resultDiv.innerHTML = '<div class="card" style="color:red;text-align:center;">আপনার দেওয়া নাম্বারে কোন ভলেন্টিয়ার পাওয়া যায়নি।</div>';
         return;
     }
 
-    box.innerHTML=`
-    <div class="card profile">
-        <img src="${v.photo}" alt="${v.name}">
-        <h3>স্বাগতম ${v.name}</h3>
-        <p>দায়িত্ব: ${v.duty}</p>
-        <p>রুম: ${v.room}</p>
-        <p>মোবাইল: ${v.phone}</p>
+    // Volunteer profile card
+    let html = `<div class="card profile">
+        <img src="${volunteer.photo}" alt="${volunteer.name}">
+        <h3>স্বাগতম ${volunteer.name}</h3>
+        <p>দায়িত্ব: ${volunteer.duty} | রুম: ${volunteer.room}</p>
+        <p>মোবাইল: ${volunteer.phone} | ইমেইল: ${volunteer.email}</p>
+        <p>রক্তের গ্রুপ: ${volunteer.blood} | টি-শার্ট: ${volunteer.tshirt}</p>
+        <p>অতিরিক্ত তথ্য: ${volunteer.extra}</p>
     </div>`;
 
-    const same = volunteers.filter(x=>x.room===v.room && x.phone!==v.phone);
-    if(same.length){
-        let html='<div class="card same-duty"><h4>একই রুমে গার্ড</h4>';
-        same.forEach(s=>{
-            html+=`<div class="same-duty-item">
-            <img src="${s.photo}" alt="${s.name}"><span>${s.name}</span>
+    // Same duty members
+    const sameDuty = volunteers.filter(v => v.duty === volunteer.duty && v.phone !== volunteer.phone);
+    if (sameDuty.length > 0) {
+        html += `<div class="card same-duty">
+            <h4>একই দায়িত্বের অন্যান্য ভলেন্টিয়ার</h4>`;
+        sameDuty.forEach(v => {
+            html += `<div class="same-duty-item">
+                <img src="${v.photo}" alt="${v.name}">
+                <span>${v.name} | রুম: ${v.room}</span>
             </div>`;
         });
-        html+='</div>';
-        box.innerHTML+=html;
+        html += `</div>`;
     }
+
+    // Room details for duty = "Guard" (example)
+    if (volunteer.duty.toLowerCase() === 'guard') {
+        html += `<div class="card">
+            <h4>${volunteer.room} রুমের বিস্তারিত</h4>
+            <p>${volunteer.roomDetails || 'ডিটেইলস দেওয়া হয়নি'}</p>
+        </div>`;
+    }
+
+    resultDiv.innerHTML = html;
 }
 
-// ===== Admin Login =====
-function loginAdmin(){
+// =================== ADMIN PANEL ===================
+const adminCreds = [
+    {username:'admin1', password:'1234'},
+    {username:'admin2', password:'abcd'}
+];
+
+function adminLogin() {
     const user = document.getElementById('adminUser').value.trim();
     const pass = document.getElementById('adminPass').value.trim();
-    if(user===adminData.username && pass===adminData.password){
-        document.getElementById('adminTable').style.display='block';
-        document.getElementById('adminLogin').style.display='none';
-        loadAdminTable();
-    } else{
-        alert('Username অথবা Password ভুল!');
-    }
-}
+    const loginMsg = document.getElementById('adminLoginMsg');
 
-// ===== Load Admin Table =====
-function loadAdminTable(){
-    const tbody = document.getElementById('adminTbody');
-    tbody.innerHTML='';
-    volunteers.forEach(v=>{
+    const valid = adminCreds.find(u => u.username === user && u.password === pass);
+    if (!valid) {
+        alert('Username বা Password ভুল!');
+        return;
+    }
+
+    document.getElementById('adminTable').style.display = 'block';
+
+    // Filter dropdown
+    const filterSelect = document.getElementById('filterDuty');
+    const duties = [...new Set(volunteers.map(v => v.duty))];
+    filterSelect.innerHTML = `<option value="">সকল দায়িত্ব</option>`;
+    duties.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        filterSelect.appendChild(opt);
+    });
+
+    // Table
+    const tbody = document.querySelector('#adminTable tbody');
+    tbody.innerHTML = '';
+    volunteers.forEach(v => {
         const row = document.createElement('tr');
-        row.innerHTML=`
-        <td>${v.name}</td>
-        <td><img src="${v.photo}" style="width:35px;height:45px;object-fit:cover;border-radius:4px;"></td>
-        <td>${v.phone}</td>
-        <td>${v.email||''}</td>
-        <td>${v.gender}</td>
-        <td>${v.blood}</td>
-        <td>${v.duty}</td>
-        <td>${v.room}</td>
-        <td>${v.tshirt}</td>
-        <td>${v.extra}</td>
+        row.innerHTML = `
+            <td><img src="${v.photo}" style="width:35px;height:45px;object-fit:cover;border-radius:3px;"> ${v.name}</td>
+            <td>${v.gender}</td>
+            <td>${v.phone}</td>
+            <td>${v.email}</td>
+            <td>${v.blood}</td>
+            <td>${v.duty}</td>
+            <td>${v.room}</td>
+            <td>${v.tshirt}</td>
+            <td>${v.extra}</td>
         `;
         tbody.appendChild(row);
     });
+}
 
-    const filter = document.getElementById('filterDuty');
-    const duties = [...new Set(volunteers.map(v=>v.duty))];
-    filter.innerHTML='<option value="">সকল দায়িত্ব</option>';
-    duties.forEach(d=>{
-        const opt = document.createElement('option');
-        opt.value=d; opt.textContent=d;
-        filter.appendChild(opt);
+// Filter admin table by duty
+function filterDutyList() {
+    const filterValue = document.getElementById('filterDuty').value;
+    const tbody = document.querySelector('#adminTable tbody');
+    Array.from(tbody.rows).forEach(row => {
+        row.style.display = (!filterValue || row.cells[5].textContent === filterValue) ? '' : 'none';
     });
 }
 
-// ===== Filter Table =====
-function filterDutyList(){
-    const val = document.getElementById('filterDuty').value;
-    const tbody = document.getElementById('adminTbody');
-    Array.from(tbody.rows).forEach(r=>{
-        r.style.display=(val==='' || r.cells[6].textContent===val)?'':'none';
-    });
+// PDF Download placeholder
+function downloadVolunteerPDF() {
+    window.open('volunteers.pdf', '_blank');
+}
+
+// =================== DEFAULT VOLUNTEER TAB ===================
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("volunteer").style.display = "block";
+});    });
 }
 
 // ===== PDF Download =====
